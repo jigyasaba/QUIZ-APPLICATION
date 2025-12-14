@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Round 4 | Quiz</title>
-    <link rel="stylesheet" href="/css/question.css">
+    <link rel="stylesheet" href="../css/question.css">
   </head>
   <body>
     <!-- Loader -->
@@ -13,6 +13,9 @@
   </div>
     <header>Welcome to the Quiz!</header>
     <div class="quiz-container">
+      <div class="progress-container">
+    <div id="progress-bar"></div>
+  </div>
       <div id="timer" class="hidden">Time Left: <span id="time-remaining"></span></div>
       <button id="start-timer-btn" onclick="startTimer()">Start Timer</button>
       <div class="question-section">
@@ -32,10 +35,7 @@
     </div>
 
     <footer class="footer">
-      <p>
-        Designed with ❤️ by
-        <a href="https://tejasmali.web.app" target="_blank">Tejas Mali</a>
-      </p>
+     
     </footer>
 
     <script>
@@ -160,6 +160,6 @@ const questions = [
 ];
 
   </script>
-   <script src="/js/script.js"></script>
+   <script src="../js/script.js"></script>
   </body>
 </html> 

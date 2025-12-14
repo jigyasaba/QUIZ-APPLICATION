@@ -70,10 +70,12 @@ let timerInterval; // To store the interval ID
       const backBtn = document.getElementById("back-btn");
 
       const optionLabels = ["A", "B", "C", "D"];
-
+      let score = 0;
+      let correctAnswers = 0;
+      let wrongAnswers = 0;
       // Load the first question
       loadQuestion();
-
+      
       function loadQuestion() {
         const question = questions[currentQuestionIndex];
         questionText.innerHTML = question.question;
@@ -82,7 +84,7 @@ let timerInterval; // To store the interval ID
         explanationDiv.classList.add("hidden");
         nextBtn.classList.add("hidden");
         backBtn.classList.remove("hidden");
-
+         updateProgressBar();
         question.options.forEach((option, index) => {
           const li = document.createElement("li");
           li.innerHTML = `
@@ -94,6 +96,8 @@ let timerInterval; // To store the interval ID
             checkAnswer(li, option, question.correct, `icon-${index}`);
           optionsList.appendChild(li);
         });
+        resetTimer();
+        startTimer();
       }
 
       function checkAnswer(selectedOption, chosen, correct, iconId) {
@@ -103,9 +107,12 @@ let timerInterval; // To store the interval ID
         if (chosen === correct) {
           selectedOption.classList.add("correct");
           setIcon(iconId, "check");
+          score += 2;            
+          correctAnswers++;
         } else {
           selectedOption.classList.add("incorrect");
           setIcon(iconId, "cross");
+           wrongAnswers++; 
           options.forEach((opt, idx) => {
             if (opt.querySelector(".option-text").textContent === correct) {
               opt.classList.add("correct");
@@ -133,19 +140,7 @@ let timerInterval; // To store the interval ID
         }
       }
 
-      function loadNextQuestion() {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < questions.length) {
-          loadQuestion();
-        } else {
-          questionText.innerHTML = "🎉 Quiz Completed! ";
-          optionsList.innerHTML = "";
-          feedbackDiv.textContent = "";
-          explanationDiv.textContent = "";
-          nextBtn.classList.add("hidden");
-          backBtn.classList.add("hidden");
-        }
-      }
+      
 
       function loadPreviousQuestion() {
         if (currentQuestionIndex > 0) {
@@ -154,36 +149,51 @@ let timerInterval; // To store the interval ID
         }
       }
       function loadNextQuestion() {
-        resetTimer(); // Reset the timer
-        currentQuestionIndex++;
-        if (currentQuestionIndex < questions.length) {
-          loadQuestion();
-        } else {
-          questionText.innerHTML = `
-<div class="completion-message">
-  🎉  This Round Completed! Great job! 🎉
-  <br>
-  <img 
-    src="https://cdn.dribbble.com/users/2185205/screenshots/7886140/media/90211520c82920dcaf6aea7604aeb029.gif" 
-    alt="Celebration GIF" 
-    class="completion-gif"
-  />
-   <br>
-        <a href="/start-page/round-2-start.html" class="completion-btn">
-          <button>Next Round</button>
-        </a>
-</div>
-`;
-          optionsList.innerHTML = "";
-          feedbackDiv.textContent = "";
-          explanationDiv.textContent = "";
-          nextBtn.classList.add("hidden");
-          backBtn.classList.add("hidden");
+  resetTimer();
+  currentQuestionIndex++;
 
-          // Optional: Add a confetti effect
-          addConfettiEffect();
-        }
+  if (currentQuestionIndex < questions.length) {
+    loadQuestion();
+  } 
+  else {
+  hideTimerUI();
+
+  const progressBar = document.getElementById("progress-bar");
+  if (progressBar) progressBar.style.width = "100%";
+
+  questionText.innerHTML = `
+    <div class="completion-message">
+      🎉 This Round Completed! 🎉<br><br>
+
+      <strong>📊 Round Summary</strong><br>
+      Total Questions: ${questions.length}<br>
+      Correct Answers: ${correctAnswers}<br>
+      Wrong Answers: ${wrongAnswers}<br>
+      <strong>Score: ${score} / ${questions.length * 2}</strong>
+
+      <br><br>
+
+      ${
+        typeof NEXT_ROUND_URL !== "undefined"
+          ? `<a href="${NEXT_ROUND_URL}">
+               <button>Next Round</button>
+             </a>`
+          : `<button onclick="location.reload()">Restart Quiz</button>`
       }
+    </div>
+  `;
+
+  optionsList.innerHTML = "";
+  feedbackDiv.textContent = "";
+  explanationDiv.textContent = "";
+  nextBtn.classList.add("hidden");
+  backBtn.classList.add("hidden");
+
+  addConfettiEffect();
+}
+
+}
+
 
       // Confetti Effect (Optional)
       function addConfettiEffect() {
@@ -207,6 +217,24 @@ let timerInterval; // To store the interval ID
           confettiContainer.remove();
         }, 3000);
       }
+      function hideTimerUI() {
+  const timer = document.getElementById("timer");
+  const startBtn = document.getElementById("start-timer-btn");
 
+  if (timer) timer.classList.add("hidden");
+  if (startBtn) startBtn.classList.add("hidden");
+
+  clearInterval(timerInterval);
+}
+
+function updateProgressBar() {
+  const progressBar = document.getElementById("progress-bar");
+  if (!progressBar) return;
+
+  const progress =
+    ((currentQuestionIndex + 1) / questions.length) * 100;
+
+  progressBar.style.width = `${progress}%`;
+}
 
 
